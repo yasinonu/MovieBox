@@ -31,4 +31,15 @@ class AuthViewModel: ObservableObject {
             print(error)
         }
     }
+    
+    // Fetch me
+    public func fetchMe() async {
+        do {
+            let response = try await apiService.fetchMe()
+            print(response)
+        }
+        catch {
+            print(error)
+        }
+    }
 }

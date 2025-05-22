@@ -23,10 +23,21 @@ struct APIService {
         return response
     }
     
+    // Login User : Login an existing user
+    
     func loginUser(email: String, password: String) async throws -> RegisterResponse {
         let body = LoginRequestBody(email: email, password: password)
         
         let response: RegisterResponse = try await sendPOSTRequest(path: "api/auth/login", body: body)
+        
+        return response
+    }
+    
+    // Fetch Me : Retrieve the current user's information
+    
+    func fetchMe() async throws -> User {
+        let accessToken = ""
+        let response: User = try await sendGETRequest(path: "api/auth/me", accessToken: accessToken)
         
         return response
     }
@@ -36,7 +47,7 @@ struct APIService {
     private func sendGETRequest<Response: Decodable>(path: String, accessToken: String? = nil) async throws -> Response {
         let url = baseURL.appendingPathComponent(path)
         
-        var request = URLRequest(url: url)
+        let request = URLRequest(url: url)
         
         return try await send(request: request, accessToken: accessToken)
     }
