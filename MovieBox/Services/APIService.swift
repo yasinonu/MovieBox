@@ -46,8 +46,6 @@ struct APIService {
         
         let response: RegisterResponse = try await sendPOSTRequest(path: "api/auth/login", body: body)
         
-        keychainHelper.save(response.token, service: service, account: account)
-        
         return response
     }
     
@@ -60,6 +58,10 @@ struct APIService {
     }
     
     // MARK: - Helpers
+    
+    public func save(accessToken: String) {
+        keychainHelper.save(accessToken, service: service, account: account)
+    }
     
     private func sendGETRequest<Response: Decodable>(path: String, accessToken: String? = nil) async throws -> Response {
         let url = baseURL.appendingPathComponent(path)
