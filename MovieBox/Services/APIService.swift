@@ -11,6 +11,18 @@ import Foundation
 struct APIService {
     let baseURL: URL = URL(string: "https://moviatask.cerasus.app")!
     
+    // MARK: Authentication
+    
+    // Register User : Register a new user
+    
+    func registerUser(name: String, surname: String, email: String, password: String) async throws -> RegisterResponse {
+        let body = RegisterRequestBody(name: name, surname: surname, email: email, password: password)
+        
+        let response: RegisterResponse = try await sendRequest(path: "api/auth/register", method: "POST", body: body)
+        
+        return response
+    }
+    
     // MARK: - Helpers
     
     // Send Request : Send a request to the server
