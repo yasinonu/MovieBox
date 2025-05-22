@@ -20,4 +20,15 @@ class AuthViewModel: ObservableObject {
             print(error)
         }
     }
+    
+    // Login user
+    public func loginUser(email: String, password: String) async {
+        do {
+            let response = try await apiService.loginUser(email: email, password: password)
+            print(response)
+        }
+        catch {
+            print(error)
+        }
+    }
 }

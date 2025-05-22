@@ -23,6 +23,15 @@ struct APIService {
         return response
     }
     
+    func loginUser(email: String, password: String) async throws -> RegisterResponse {
+        let body = LoginRequestBody(email: email, password: password)
+        
+        let response: RegisterResponse = try await sendRequest(path: "api/auth/login", method: "POST", body: body)
+        
+        return response
+    }
+        
+    
     // MARK: - Helpers
     
     // Send Request : Send a request to the server
