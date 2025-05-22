@@ -9,9 +9,25 @@ import Foundation
 
 
 struct APIService {
-    let baseURL: URL = URL(string: "https://moviatask.cerasus.app")!
+    private let baseURL: URL = URL(string: "https://moviatask.cerasus.app")!
+    
+    private let keychainHelper = KeychainHelper.shared
     
     // MARK: Authentication
+    
+    static var accessToken: String? = nil
+    
+    // Service and Account for Keychain
+    private let service = "com.amogus.token"
+    private let account = "accessToken"
+    
+    // Fetch Token from Keychain
+    init() {
+        if let token = KeychainHelper.shared.read(service: service, account: account) {
+            APIService.accessToken = token
+            print("Token: \(token)")
+        }
+    }
     
     // Register User : Register a new user
     
@@ -30,14 +46,15 @@ struct APIService {
         
         let response: RegisterResponse = try await sendPOSTRequest(path: "api/auth/login", body: body)
         
+        keychainHelper.save(response.token, service: service, account: account)
+        
         return response
     }
     
     // Fetch Me : Retrieve the current user's information
     
     func fetchMe() async throws -> User {
-        let accessToken = ""
-        let response: User = try await sendGETRequest(path: "api/auth/me", accessToken: accessToken)
+        let response: User = try await sendGETRequest(path: "api/auth/me", accessToken: Self.accessToken)
         
         return response
     }
