@@ -33,6 +33,27 @@ struct APIService {
     
     // MARK: - Helpers
     
+    private func sendGETRequest<Response: Decodable>(path: String, accessToken: String? = nil) async throws -> Response {
+        let url = baseURL.appendingPathComponent(path)
+        
+        var request = URLRequest(url: url)
+        
+        return try await send(request: request, accessToken: accessToken)
+    }
+    
+    private func sendPOSTRequest<Response: Decodable, RequestBody: Encodable>(path: String, body: RequestBody, accessToken: String? = nil) async throws -> Response {
+        let url = baseURL.appendingPathComponent(path)
+        
+        var request = URLRequest(url: url)
+        
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        request.httpBody = try JSONEncoder().encode(body)
+        
+        return try await send(request: request, accessToken: accessToken)
+    }
+    
     // Send Request : Send a request to the server
     private func send<Response: Decodable>(request: URLRequest, accessToken: String? = nil) async throws -> Response {
         var request = request
