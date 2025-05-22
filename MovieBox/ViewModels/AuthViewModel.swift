@@ -30,6 +30,10 @@ class AuthViewModel: ObservableObject {
             APIService.accessToken = token
             self.isAuthenticated = true
             print("Token: \(token)")
+            
+            Task {
+                await fetchMe()
+            }
         }
     }
     
@@ -39,6 +43,7 @@ class AuthViewModel: ObservableObject {
     }
     
     // Register user
+    @MainActor
     public func registerUser() {
         Task {
             do {
@@ -54,6 +59,7 @@ class AuthViewModel: ObservableObject {
     }
     
     // Login user
+    @MainActor
     public func loginUser() {
         Task {
             do {
@@ -68,7 +74,16 @@ class AuthViewModel: ObservableObject {
         }
     }
     
+    // Logout user
+    func logout() {
+        apiService.deleteAccessToken()
+        APIService.accessToken = nil
+        currentUser = nil
+        isAuthenticated = false
+    }
+    
     // Fetch current user
+    @MainActor
     public func fetchMe() async {
         do {
             let response = try await apiService.fetchMe()
@@ -79,6 +94,7 @@ class AuthViewModel: ObservableObject {
         }
         catch {
             print(error)
+            logout()
         }
     }
 }
