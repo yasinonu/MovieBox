@@ -11,4 +11,18 @@ struct User: Decodable {
     let name: String
     let surname: String
     let email: String
+    
+    let likedMovies: [String]
+    let createdAt: String
+    let updatedAt: String
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case name
+        case surname
+        case email
+        case likedMovies
+        case createdAt
+        case updatedAt
+    }
 }

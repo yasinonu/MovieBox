@@ -8,5 +8,5 @@
 struct RegisterResponse: Decodable {
     let message: String
     let token: String
-    let user: User
+    let user: AuthUser
 }
