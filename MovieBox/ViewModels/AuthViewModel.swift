@@ -8,5 +8,16 @@
 import Foundation
 
 class AuthViewModel: ObservableObject {
+    private let apiService: APIService = .init()
     
+    // Register user
+    
+    public func registerUser(name: String, surname: String, email: String, password: String) async {
+        do {
+            let response = try await apiService.registerUser(name: name, surname: surname, email: email, password: password)
+        }
+        catch {
+            print(error)
+        }
+    }
 }
