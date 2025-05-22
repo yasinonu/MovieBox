@@ -15,8 +15,16 @@ class AuthViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var password: String = ""
     
+    // Switch UI to Register View / Login View
+    @Published var isRegisterView: Bool = false
+    
+    @MainActor
+    public func switchAuthView() {
+        isRegisterView.toggle()
+    }
+    
     // Register user
-    public func registerUser() async {
+    public func registerUser() {
         Task {
             do {
                 let response = try await apiService.registerUser(name: name, surname: surname, email: email, password: password)
