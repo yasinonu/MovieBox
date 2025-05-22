@@ -10,25 +10,36 @@ import Foundation
 class AuthViewModel: ObservableObject {
     private let apiService: APIService = .init()
     
-    // Register user
+    @Published var name: String = ""
+    @Published var surname: String = ""
+    @Published var email: String = ""
+    @Published var password: String = ""
     
-    public func registerUser(name: String, surname: String, email: String, password: String) async {
-        do {
-            let response = try await apiService.registerUser(name: name, surname: surname, email: email, password: password)
-        }
-        catch {
-            print(error)
+    // Register user
+    public func registerUser() async {
+        Task {
+            do {
+                let response = try await apiService.registerUser(name: name, surname: surname, email: email, password: password)
+                apiService.save(accessToken: response.token)
+                print(response)
+            }
+            catch {
+                print(error)
+            }
         }
     }
     
     // Login user
-    public func loginUser(email: String, password: String) async {
-        do {
-            let response = try await apiService.loginUser(email: email, password: password)
-            print(response)
-        }
-        catch {
-            print(error)
+    public func loginUser() {
+        Task {
+            do {
+                let response = try await apiService.loginUser(email: email, password: password)
+                apiService.save(accessToken: response.token)
+                print(response)
+            }
+            catch {
+                print(error)
+            }
         }
     }
     
