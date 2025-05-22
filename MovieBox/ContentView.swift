@@ -11,7 +11,13 @@ struct ContentView: View {
     @StateObject var authViewModel = AuthViewModel()
     
     var body: some View {
-        LoginView()
+        if authViewModel.isAuthenticated {
+            Text("Home")
+        }
+        else {
+            LoginView()
+                .environmentObject(authViewModel)
+        }
     }
 }
 
