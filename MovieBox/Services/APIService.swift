@@ -64,6 +64,10 @@ struct APIService {
         KeychainHelper.shared.read(service: service, account: account)
     }
     
+    public func deleteAccessToken() {
+        KeychainHelper.shared.delete(service: service, account: account)
+    }
+    
     private func sendGETRequest<Response: Decodable>(path: String, accessToken: String? = nil) async throws -> Response {
         let url = baseURL.appendingPathComponent(path)
         
@@ -94,6 +98,8 @@ struct APIService {
         }
         
         let (data, response) = try await URLSession.shared.data(for: request)
+        
+        print(String(data: data, encoding: .utf8) ?? "")
         
         let responseData = try JSONDecoder().decode(Response.self, from: data)
         
