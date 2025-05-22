@@ -18,7 +18,7 @@ struct APIService {
     func registerUser(name: String, surname: String, email: String, password: String) async throws -> RegisterResponse {
         let body = RegisterRequestBody(name: name, surname: surname, email: email, password: password)
         
-        let response: RegisterResponse = try await sendRequest(path: "api/auth/register", method: "POST", body: body)
+        let response: RegisterResponse = try await sendPOSTRequest(path: "api/auth/register", body: body)
         
         return response
     }
@@ -26,25 +26,19 @@ struct APIService {
     func loginUser(email: String, password: String) async throws -> RegisterResponse {
         let body = LoginRequestBody(email: email, password: password)
         
-        let response: RegisterResponse = try await sendRequest(path: "api/auth/login", method: "POST", body: body)
+        let response: RegisterResponse = try await sendPOSTRequest(path: "api/auth/login", body: body)
         
         return response
     }
-        
     
     // MARK: - Helpers
     
     // Send Request : Send a request to the server
-    private func sendRequest<Response: Decodable, RequestBody: Encodable>(path: String, method: String = "GET", body: RequestBody? = nil) async throws -> Response {
-        let url = baseURL.appendingPathComponent(path)
+    private func send<Response: Decodable>(request: URLRequest, accessToken: String? = nil) async throws -> Response {
+        var request = request
         
-        var request = URLRequest(url: url)
-        
-        request.httpMethod = method
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        if let body {
-            request.httpBody = try JSONEncoder().encode(body)
+        if let accessToken {
+            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
         
         let (data, response) = try await URLSession.shared.data(for: request)
