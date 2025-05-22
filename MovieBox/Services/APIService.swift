@@ -21,14 +21,6 @@ struct APIService {
     private let service = "com.amogus.token"
     private let account = "accessToken"
     
-    // Fetch Token from Keychain
-    init() {
-        if let token = KeychainHelper.shared.read(service: service, account: account) {
-            APIService.accessToken = token
-            print("Token: \(token)")
-        }
-    }
-    
     // Register User : Register a new user
     
     func registerUser(name: String, surname: String, email: String, password: String) async throws -> RegisterResponse {
@@ -57,10 +49,19 @@ struct APIService {
         return response
     }
     
+    // MARK: Movies
+    
+    
+    
     // MARK: - Helpers
     
+    // Save Access Token : Save the access token to Keychain
     public func save(accessToken: String) {
         keychainHelper.save(accessToken, service: service, account: account)
+    }
+    
+    public func readAccessToken() -> String? {
+        KeychainHelper.shared.read(service: service, account: account)
     }
     
     private func sendGETRequest<Response: Decodable>(path: String, accessToken: String? = nil) async throws -> Response {

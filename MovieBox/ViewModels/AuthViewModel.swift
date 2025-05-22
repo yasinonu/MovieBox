@@ -10,15 +10,30 @@ import Foundation
 class AuthViewModel: ObservableObject {
     private let apiService: APIService = .init()
     
+    // Register/Login Properties
     @Published var name: String = ""
     @Published var surname: String = ""
     @Published var email: String = ""
     @Published var password: String = ""
     
-    // Switch UI to Register View / Login View
+    // Register/Login State
     @Published var isRegisterView: Bool = false
     
-    @MainActor
+    // Authentication State
+    @Published var isAuthenticated: Bool = false
+    
+    @Published var currentUser: User? = nil
+    
+    // Fetch Token from Keychain
+    init() {
+        if let token = apiService.readAccessToken() {
+            APIService.accessToken = token
+            self.isAuthenticated = true
+            print("Token: \(token)")
+        }
+    }
+    
+    // Switch UI to Register View / Login View
     public func switchAuthView() {
         isRegisterView.toggle()
     }
@@ -29,6 +44,7 @@ class AuthViewModel: ObservableObject {
             do {
                 let response = try await apiService.registerUser(name: name, surname: surname, email: email, password: password)
                 apiService.save(accessToken: response.token)
+                isAuthenticated = true
                 print(response)
             }
             catch {
@@ -43,6 +59,7 @@ class AuthViewModel: ObservableObject {
             do {
                 let response = try await apiService.loginUser(email: email, password: password)
                 apiService.save(accessToken: response.token)
+                isAuthenticated = true
                 print(response)
             }
             catch {
@@ -51,11 +68,14 @@ class AuthViewModel: ObservableObject {
         }
     }
     
-    // Fetch me
+    // Fetch current user
     public func fetchMe() async {
         do {
             let response = try await apiService.fetchMe()
             print(response)
+            await MainActor.run {
+                self.currentUser = response
+            }
         }
         catch {
             print(error)
