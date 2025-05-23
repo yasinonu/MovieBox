@@ -13,6 +13,8 @@ struct APIService {
     
     private let keychainHelper = KeychainHelper.shared
     
+    static let shared: APIService = .init()
+    
     // MARK: Authentication
     
     static var accessToken: String? = nil
@@ -51,7 +53,13 @@ struct APIService {
     
     // MARK: Movies
     
-    
+    // Get Movies : Retrieve a list of movies
+    func fetchAllMovies() async throws -> [Movie] {
+        let response: [Movie] = try await sendGETRequest(path: "api/movies")
+        
+        return response
+    }
+
     
     // MARK: - Helpers
     
