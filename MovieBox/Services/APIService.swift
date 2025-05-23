@@ -74,6 +74,14 @@ struct APIService {
         return response
     }
     
+    // Unlike Movie : Unlike a specific movie by ID
+    func unlikeMovie(id: Int) async throws -> MovieLikeResponse {
+        let response: MovieLikeResponse = try await sendPOSTRequest(path: "api/movies/unlike/\(id)", body: nil as String?, accessToken: Self.accessToken)
+        
+        return response
+    }
+
+    
     // MARK: - Helpers
     
     // Save Access Token : Save the access token to Keychain
