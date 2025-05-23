@@ -12,7 +12,7 @@ struct User: Decodable {
     let surname: String
     let email: String
     
-    let likedMovies: [String]
+    let likedMovies: [Movie.ID]
     let createdAt: String
     let updatedAt: String
     
