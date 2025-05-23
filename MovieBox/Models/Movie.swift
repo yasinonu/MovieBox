@@ -20,4 +20,15 @@ struct Movie: Codable, Identifiable {
         case id, title, year, rating, actors, category, description
         case posterURL = "poster_url"
     }
+    
+    static let mock = Movie(
+        id: 20,
+        title: "Blade Runner 2049",
+        year: 2017,
+        rating: 8,
+        actors: ["Ryan Gosling", "Harrison Ford", "Ana de Armas"],
+        category: "Science Fiction",
+        posterURL: "https://de.web.img3.acsta.net/pictures/17/08/30/10/16/406748.jpg",
+        description: "Young Blade Runner K's discovery of a long-buried secret leads him to track down former blade runner Rick Deckard."
+    )
 }
