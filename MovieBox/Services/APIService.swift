@@ -66,7 +66,13 @@ struct APIService {
         
         return response
     }
-
+    
+    // Like Movie : Like a specific movie by ID
+    func likeMovie(id: Int) async throws -> MovieLikeResponse {
+        let response: MovieLikeResponse = try await sendPOSTRequest(path: "api/movies/like/\(id)", body: nil as String?, accessToken: Self.accessToken)
+        
+        return response
+    }
     
     // MARK: - Helpers
     
@@ -75,12 +81,14 @@ struct APIService {
         keychainHelper.save(accessToken, service: service, account: account)
     }
     
+    // Read Access Token : Retrieve the access token from Keychain
     public func readAccessToken() -> String? {
-        KeychainHelper.shared.read(service: service, account: account)
+        keychainHelper.read(service: service, account: account)
     }
     
+    // Delete Access Token : Delete the access token from Keychain
     public func deleteAccessToken() {
-        KeychainHelper.shared.delete(service: service, account: account)
+        keychainHelper.delete(service: service, account: account)
     }
     
     private func sendGETRequest<Response: Decodable>(path: String, accessToken: String? = nil) async throws -> Response {
@@ -91,7 +99,7 @@ struct APIService {
         return try await send(request: request, accessToken: accessToken)
     }
     
-    private func sendPOSTRequest<Response: Decodable, RequestBody: Encodable>(path: String, body: RequestBody, accessToken: String? = nil) async throws -> Response {
+    private func sendPOSTRequest<Response: Decodable, RequestBody: Encodable>(path: String, body: RequestBody? = nil, accessToken: String? = nil) async throws -> Response {
         let url = baseURL.appendingPathComponent(path)
         
         var request = URLRequest(url: url)
@@ -99,7 +107,9 @@ struct APIService {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        request.httpBody = try JSONEncoder().encode(body)
+        if let body {
+            request.httpBody = try JSONEncoder().encode(body)
+        }
         
         return try await send(request: request, accessToken: accessToken)
     }
