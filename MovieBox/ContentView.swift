@@ -10,9 +10,12 @@ import SwiftUI
 struct ContentView: View {
     @StateObject var authViewModel = AuthViewModel()
     
+    @StateObject var movieViewModel = MoviesViewModel()
+    
     var body: some View {
         if authViewModel.isAuthenticated {
-            Text("Home")
+            MoviesView()
+                .environmentObject(movieViewModel)
         }
         else {
             LoginView()
