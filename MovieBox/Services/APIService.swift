@@ -59,6 +59,13 @@ struct APIService {
         
         return response
     }
+    
+    // Get Movie : Retrieve a specific movie by ID
+    func fetchMovieBy(id: String) async throws -> Movie {
+        let response: Movie = try await sendGETRequest(path: "api/movies/\(id)")
+        
+        return response
+    }
 
     
     // MARK: - Helpers
