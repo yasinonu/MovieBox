@@ -105,7 +105,7 @@ struct APIService {
         
         return response
     }
-
+    
     
     // MARK: - Helpers
     
@@ -138,14 +138,35 @@ struct APIService {
         }
         
         if let body {
-            request.httpBody = try JSONEncoder().encode(body)
+            guard let httpBody = try? JSONEncoder().encode(body) else {
+                throw AppError.encodingError
+            }
+            request.httpBody = httpBody
         }
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let (data, response) = try? await URLSession.shared.data(for: request) else {
+            print("Failed to fetch data from \(url)")
+            throw AppError.networkError
+        }
         
-        print(String(data: data, encoding: .utf8) ?? "")
+        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                print("Error Response: \(errorResponse)")
+                throw AppError.custom(errorResponse.error)
+            }
+            else if let messageResponse = try? JSONDecoder().decode(MessageResponse.self, from: data) {
+                print("Message Response: \(messageResponse)")
+                throw AppError.custom(messageResponse.message)
+            }
+            else {
+                throw AppError.networkError
+            }
+        }
         
-        let responseData = try JSONDecoder().decode(Response.self, from: data)
+        guard let responseData = try? JSONDecoder().decode(Response.self, from: data) else {
+            print("Failed to decode response")
+            throw AppError.decodingError
+        }
         
         return responseData
     }
