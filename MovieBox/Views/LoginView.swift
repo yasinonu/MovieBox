@@ -61,6 +61,21 @@ struct LoginView: View {
             Spacer()
         }
         .padding()
+        .onChange(of: authViewModel.name) { oldValue, newValue in
+            if newValue.count > 48 {
+                authViewModel.name = String(newValue.prefix(48))
+            }
+        }
+        .onChange(of: authViewModel.surname) { oldValue, newValue in
+            if newValue.count > 48 {
+                authViewModel.surname = String(newValue.prefix(48))
+            }
+        }
+        .onChange(of: authViewModel.email) { oldValue, newValue in
+            if newValue.count > 48 {
+                authViewModel.email = String(newValue.prefix(64))
+            }
+        }
     }
 }
 
