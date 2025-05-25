@@ -32,4 +32,18 @@ class UserViewModel: ObservableObject {
             print("Error fetching user data: \(error)")
         }
     }
+    
+    public func updateUser() async {
+        do {
+            let response = try await apiService.updateUserProfile(name: name, surname: surname, email: email, password: password)
+            print(response.user)
+        }
+        catch {
+            print("Error updating user profile: \(error)")
+        }
+    }
+    
+    private func logout() {
+        currentUser = nil
+    }
 }
