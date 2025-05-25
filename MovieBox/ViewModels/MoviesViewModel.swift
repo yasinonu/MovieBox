@@ -41,4 +41,17 @@ class MoviesViewModel: ObservableObject {
             print("Error liking movie: \(error)")
         }
     }
+    
+    @MainActor
+    public func unlikeMovie(id: Movie.ID) async {
+        do {
+            let response = try await apiService.unlikeMovie(id: id)
+            self.likedMovies = response.likedMovies
+            
+            print("Unliked movies: \(likedMovies)")
+        }
+        catch {
+            print("Error unliking movie: \(error)")
+        }
+    }
 }
