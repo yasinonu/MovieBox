@@ -48,10 +48,23 @@ class MoviesViewModel: ObservableObject {
             let response = try await apiService.unlikeMovie(id: id)
             self.likedMovies = response.likedMovies
             
-            print("Unliked movies: \(likedMovies)")
+            print("Liked movies: \(likedMovies)")
         }
         catch {
             print("Error unliking movie: \(error)")
+        }
+    }
+    
+    @MainActor
+    public func fetchLikedMovies() async {
+        do {
+            let response = try await apiService.fetchLikedMovies()
+            self.likedMovies = response
+            
+            print("Fetched liked movies: \(likedMovies)")
+        }
+        catch {
+            print("Error fetching liked movies: \(error)")
         }
     }
 }

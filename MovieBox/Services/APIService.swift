@@ -80,6 +80,17 @@ struct APIService {
         
         return response
     }
+    
+    // MARK: Users
+    
+    // Get Liked Movies : Retrieve a list of movies liked by the current user
+    func fetchLikedMovies() async throws -> [Movie.ID] {
+        let response: [Movie.ID] = try await sendGETRequest(path: "/api/users/liked-movie-ids", accessToken: Self.accessToken)
+        
+        return response
+    }
+        
+
 
     
     // MARK: - Helpers
