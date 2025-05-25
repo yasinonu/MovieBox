@@ -6,10 +6,16 @@
 //
 
 
-struct UpdateUserRequestBody: Encodable {
+struct UpdateUserWithPasswordRequestBody: Encodable {
     let name: String
     let surname: String
     let email: String
     let password: String
+}
+
+struct UpdateUserRequestBody: Encodable {
+    let name: String
+    let surname: String
+    let email: String
 }
 

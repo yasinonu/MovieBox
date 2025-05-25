@@ -99,11 +99,18 @@ struct APIService {
     
     // Update User Profile: Update the current user's profile information
     func updateUserProfile(name: String, surname: String, email: String, password: String) async throws -> UpdateUserProfileResponse {
-        let body = UpdateUserRequestBody(name: name, surname: surname, email: email, password: password)
-        
-        let response: UpdateUserProfileResponse = try await send(path: "api/users/profile", method: "PUT", body: body)
-        
-        return response
+        if password.isEmpty {
+            let body = UpdateUserRequestBody(name: name, surname: surname, email: email)
+            let response: UpdateUserProfileResponse = try await send(path: "api/users/profile", method: "PUT", body: body)
+            
+            return response
+        }
+        else {
+            let body = UpdateUserWithPasswordRequestBody(name: name, surname: surname, email: email, password: password)
+            let response: UpdateUserProfileResponse = try await send(path: "api/users/profile", method: "PUT", body: body)
+            
+            return response
+        }
     }
     
     
@@ -144,10 +151,7 @@ struct APIService {
             request.httpBody = httpBody
         }
         
-        guard let (data, response) = try? await URLSession.shared.data(for: request) else {
-            print("Failed to fetch data from \(url)")
-            throw AppError.networkError
-        }
+        let (data, response) = try await URLSession.shared.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
             if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
