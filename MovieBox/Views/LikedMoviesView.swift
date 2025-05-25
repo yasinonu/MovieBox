@@ -1,38 +1,32 @@
 //
-//  MoviesView.swift
+//  LikedMoviesView.swift
 //  MovieBox
 //
-//  Created by Yasin Onur on 23.05.2025.
+//  Created by Yasin Onur on 25.05.2025.
 //
 
 import SwiftUI
 
-struct MoviesView: View {
+struct LikedMoviesView: View {
     @EnvironmentObject var moviesViewModel: MoviesViewModel
     @EnvironmentObject var userViewModel: UserViewModel
     
     var body: some View {
         NavigationStack {
-            List(moviesViewModel.movies) { movie in
+            List(moviesViewModel.likedMovies) { movie in
                 NavigationLink(destination: MovieDetailView(movie: movie)) {
                     MovieRow(movie: movie, isLiked: moviesViewModel.likedMovieIDs.contains(movie.id))
                 }
             }
-            .navigationTitle("Movies")
+            .navigationTitle("Liked Movies")
             .listStyle(.inset)
             .task {
-                await userViewModel.fetchMe()
-                
-                if let user = userViewModel.currentUser {
-                    moviesViewModel.likedMovieIDs = user.likedMovies
-                }
-                
-                await moviesViewModel.fetchMovies()
+                await moviesViewModel.fetchLikedMovies()
             }
         }
     }
 }
 
 #Preview {
-    MoviesView()
+    LikedMoviesView()
 }

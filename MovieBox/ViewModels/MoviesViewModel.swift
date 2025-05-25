@@ -12,7 +12,10 @@ class MoviesViewModel: ObservableObject {
     
     // Movies
     @Published var movies: [Movie] = []
-    @Published var likedMovies: [Movie] = []
+    
+    var likedMovies: [Movie] {
+        return movies.filter { likedMovieIDs.contains($0.id) }
+    }
     
     @Published var likedMovieIDs: [Movie.ID] = []
     
@@ -43,6 +46,7 @@ class MoviesViewModel: ObservableObject {
         }
     }
     
+    // Unlike Movie
     @MainActor
     public func unlikeMovie(id: Movie.ID) async {
         do {
@@ -56,24 +60,26 @@ class MoviesViewModel: ObservableObject {
         }
     }
     
+    // Fetch Liked Movie IDs
     @MainActor
     public func fetchLikedMovieIDs() async {
         do {
             let response = try await apiService.fetchLikedMovieIDs()
             self.likedMovieIDs = response
             
-            print("Fetched liked movies: \(likedMovies)")
+            print("Fetched liked movie IDs: \(likedMovieIDs)")
         }
         catch {
-            print("Error fetching liked movies: \(error)")
+            print("Error fetching liked movie IDs: \(error)")
         }
     }
     
+    // Fetch Liked Movies
     @MainActor
     public func fetchLikedMovies() async {
         do {
             let response = try await apiService.fetchLikedMovies()
-            self.likedMovies = response
+            // self.likedMovies = response
             
             print("Fetched liked movies: \(likedMovies)")
         }
