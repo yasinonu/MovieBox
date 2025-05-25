@@ -37,6 +37,8 @@ struct MovieRow: View {
                     Text(movie.rating.formatted(.number.precision(.fractionLength(1))))
                     Spacer()
                     Image(systemName: isLiked ? "heart.fill" : "heart")
+                        .foregroundStyle(isLiked ? .red : .primary)
+                        .animation(.easeInOut, value: isLiked)
                         .onTapGesture {
                             Task {
                                 if !isLiked {
