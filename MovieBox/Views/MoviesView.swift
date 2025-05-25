@@ -21,15 +21,22 @@ struct MoviesView: View {
             .navigationTitle("Movies")
             .listStyle(.inset)
             .task {
-                await userViewModel.fetchMe()
-                
-                if let user = userViewModel.currentUser {
-                    moviesViewModel.likedMovieIDs = user.likedMovies
-                }
-                
-                await moviesViewModel.fetchMovies()
+                await fetch()
+            }
+            .refreshable {
+                await fetch()
             }
         }
+    }
+    
+    private func fetch() async {
+        await userViewModel.fetchMe()
+        
+        if let user = userViewModel.currentUser {
+            moviesViewModel.likedMovieIDs = user.likedMovies
+        }
+        
+        await moviesViewModel.fetchMovies()
     }
 }
 

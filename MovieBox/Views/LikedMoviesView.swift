@@ -18,12 +18,26 @@ struct LikedMoviesView: View {
                     MovieRow(movie: movie, isLiked: moviesViewModel.likedMovieIDs.contains(movie.id))
                 }
             }
+            .animation(.easeInOut, value: moviesViewModel.likedMovies.count)
             .navigationTitle("Liked Movies")
             .listStyle(.inset)
             .task {
-                await moviesViewModel.fetchLikedMovies()
+                await fetch()
+            }
+            .refreshable {
+                await fetch()
             }
         }
+    }
+    
+    private func fetch() async {
+        await userViewModel.fetchMe()
+        
+        if let user = userViewModel.currentUser {
+            moviesViewModel.likedMovieIDs = user.likedMovies
+        }
+        
+        await moviesViewModel.fetchMovies()
     }
 }
 
