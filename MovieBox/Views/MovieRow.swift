@@ -9,7 +9,8 @@ import SwiftUI
 
 struct MovieRow: View {
     let movie: Movie
-    // let isLiked: Bool
+    let isLiked: Bool
+    @EnvironmentObject var moviesViewModel: MoviesViewModel
     
     var body: some View {
         HStack {
@@ -35,9 +36,17 @@ struct MovieRow: View {
                         .foregroundStyle(.yellow)
                     Text(movie.rating.formatted(.number.precision(.fractionLength(1))))
                     Spacer()
-                    Button(action: {}) {
-                        Image(systemName: "heart")
-                    }
+                    Image(systemName: isLiked ? "heart.fill" : "heart")
+                        .onTapGesture {
+                            Task {
+                                if !isLiked {
+                                    await moviesViewModel.likeMovie(id: movie.id)
+                                }
+                                else {
+                                    // await moviesViewModel.unlikeMovie(id: movie.id)
+                                }
+                            }
+                        }
                 }
             }
         }
@@ -46,10 +55,11 @@ struct MovieRow: View {
 
 #Preview {
     List {
-        MovieRow(movie: .mock)
-        MovieRow(movie: .mock)
-        MovieRow(movie: .mock)
-        MovieRow(movie: .mock)
+        MovieRow(movie: .mock, isLiked: false)
+        MovieRow(movie: .mock, isLiked: false)
+        MovieRow(movie: .mock, isLiked: false)
+        MovieRow(movie: .mock, isLiked: false)
+        MovieRow(movie: .mock, isLiked: false)
     }
     .listStyle(.inset)
 }
