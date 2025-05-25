@@ -25,6 +25,9 @@ class AuthViewModel: ObservableObject {
     // Current User
     @Published var currentUser: User? = nil
     
+    // Alert Toast
+    @Published var toast: Toast? = nil
+    
     // Fetch Token from Keychain
     public func fetchToken() {
         if let token = apiService.readAccessToken() {
@@ -45,35 +48,37 @@ class AuthViewModel: ObservableObject {
     
     // Register user
     @MainActor
-    public func registerUser() {
-        Task {
-            do {
-                let response = try await apiService.registerUser(name: name, surname: surname, email: email, password: password)
-                apiService.save(accessToken: response.token)
-                isAuthenticated = true
-                print(response)
-                resetFields()
-            }
-            catch {
-                print(error)
-            }
+    public func registerUser() async {
+        do {
+            let response = try await apiService.registerUser(name: name, surname: surname, email: email, password: password)
+            apiService.save(accessToken: response.token)
+            isAuthenticated = true
+            resetFields()
+            toast = Toast(message: "Registered successfully", type: .success)
+        }
+        catch let error as AppError {
+            toast = Toast(message: error.errorDescription ?? "An error occurred", type: .error)
+        }
+        catch {
+            toast = Toast(message: "An unexpected error occurred", type: .error)
         }
     }
     
     // Login user
     @MainActor
-    public func loginUser() {
-        Task {
-            do {
-                let response = try await apiService.loginUser(email: email, password: password)
-                apiService.save(accessToken: response.token)
-                isAuthenticated = true
-                print(response)
-                resetFields()
-            }
-            catch {
-                print(error)
-            }
+    public func loginUser() async {
+        do {
+            let response = try await apiService.loginUser(email: email, password: password)
+            apiService.save(accessToken: response.token)
+            isAuthenticated = true
+            resetFields()
+            toast = Toast(message: "Logged in successfully", type: .success)
+        }
+        catch let error as AppError? {
+            toast = Toast(message: error?.errorDescription ?? "An error occurred", type: .error)
+        }
+        catch {
+            toast = Toast(message: "An unexpected error occurred", type: .error)
         }
     }
     
@@ -83,6 +88,8 @@ class AuthViewModel: ObservableObject {
         APIService.accessToken = nil
         currentUser = nil
         isAuthenticated = false
+        
+        toast = Toast(message: "Logged out", type: .message)
     }
     
     private func resetFields() {

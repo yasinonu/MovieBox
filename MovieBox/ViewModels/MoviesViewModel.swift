@@ -19,6 +19,9 @@ class MoviesViewModel: ObservableObject {
     
     @Published var likedMovieIDs: [Movie.ID] = []
     
+    // Alert Toast
+    @Published var toast: Toast? = nil
+    
     // Fetch Movies
     @MainActor
     public func fetchMovies() async {
@@ -27,8 +30,11 @@ class MoviesViewModel: ObservableObject {
             
             self.movies = movies
         }
+        catch let error as AppError {
+            toast = Toast(message: error.errorDescription ?? "An error occurred", type: .error)
+        }
         catch {
-            print("Error fetching movies: \(error)")
+            toast = Toast(message: "Failed to fetch movies", type: .error)
         }
     }
     
@@ -40,9 +46,14 @@ class MoviesViewModel: ObservableObject {
             self.likedMovieIDs = response.likedMovies
             
             print("Liked movies: \(likedMovies)")
+            
+            toast = Toast(message: "Successfully liked movie", type: .success)
+        }
+        catch let error as AppError {
+            toast = Toast(message: error.errorDescription ?? "An error occurred", type: .error)
         }
         catch {
-            print("Error liking movie: \(error)")
+            toast = Toast(message: "Failed to like movie", type: .error)
         }
     }
     
@@ -53,10 +64,13 @@ class MoviesViewModel: ObservableObject {
             let response = try await apiService.unlikeMovie(id: id)
             self.likedMovieIDs = response.likedMovies
             
-            print("Liked movies: \(likedMovies)")
+            toast = Toast(message: "Successfully unliked movie", type: .success)
+        }
+        catch let error as AppError {
+            toast = Toast(message: error.errorDescription ?? "An error occurred", type: .error)
         }
         catch {
-            print("Error unliking movie: \(error)")
+            toast = Toast(message: "Failed to unlike movie", type: .error)
         }
     }
     
@@ -66,11 +80,12 @@ class MoviesViewModel: ObservableObject {
         do {
             let response = try await apiService.fetchLikedMovieIDs()
             self.likedMovieIDs = response
-            
-            print("Fetched liked movie IDs: \(likedMovieIDs)")
+        }
+        catch let error as AppError {
+            toast = Toast(message: error.errorDescription ?? "An error occurred", type: .error)
         }
         catch {
-            print("Error fetching liked movie IDs: \(error)")
+            toast = Toast(message: "Failed to fetch liked movie", type: .error)
         }
     }
     
@@ -78,13 +93,14 @@ class MoviesViewModel: ObservableObject {
     @MainActor
     public func fetchLikedMovies() async {
         do {
-            let response = try await apiService.fetchLikedMovies()
+            let _ = try await apiService.fetchLikedMovies()
             // self.likedMovies = response
-            
-            print("Fetched liked movies: \(likedMovies)")
+        }
+        catch let error as AppError {
+            toast = Toast(message: error.errorDescription ?? "An error occurred", type: .error)
         }
         catch {
-            print("Error fetching liked movies: \(error)")
+            toast = Toast(message: "Failed to fetch liked movies", type: .error)
         }
     }
 }

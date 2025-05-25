@@ -10,13 +10,19 @@ import Foundation
 class UserViewModel: ObservableObject {
     let apiService = APIService.shared
     
+    // User Info Properties
     @Published var name: String = ""
     @Published var surname: String = ""
     @Published var email: String = ""
     @Published var password: String = ""
     
+    // Current User
     @Published var currentUser: User? = nil
     
+    // Alert Toast
+    @Published var toast: Toast? = nil
+    
+    // Fetch Current User Data
     @MainActor
     public func fetchMe() async {
         do {
@@ -28,21 +34,30 @@ class UserViewModel: ObservableObject {
             self.surname = user.surname
             self.email = user.email
         }
+        catch let error as AppError {
+            toast = Toast(message: error.errorDescription ?? "An error occurred", type: .error)
+        }
         catch {
-            print("Error fetching user data: \(error)")
+            toast = Toast(message: "Failed to fetch user", type: .error)
         }
     }
     
+    // Update User Info
+    @MainActor
     public func updateUser() async {
         do {
             let response = try await apiService.updateUserProfile(name: name, surname: surname, email: email, password: password)
-            print(response.user)
+            toast = Toast(message: "Successfully updated profile", type: .success)
+        }
+        catch let error as AppError {
+            toast = Toast(message: error.errorDescription ?? "An error occurred", type: .error)
         }
         catch {
-            print("Error updating user profile: \(error)")
+            toast = Toast(message: "Failed to update user", type: .error)
         }
     }
     
+    // Logout
     private func logout() {
         currentUser = nil
     }
