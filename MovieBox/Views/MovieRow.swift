@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct MovieRow: View {
     let movie: Movie
@@ -14,13 +15,14 @@ struct MovieRow: View {
     
     var body: some View {
         HStack {
-            AsyncImage(url: URL(string: movie.posterURL)!) { phase in
-                phase.image?
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 50, height: 75)
-            }
-            .clipShape(.rect(cornerRadius: 8))
+            KFImage(URL(string: movie.posterURL))
+                .resizable()
+                .placeholder {
+                    ProgressView()
+                }
+                .fade(duration: 0.2)
+                .frame(width: 50, height: 75)
+                .clipShape(.rect(cornerRadius: 8))
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .top) {
                     Text(movie.title)
