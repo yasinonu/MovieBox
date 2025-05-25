@@ -8,7 +8,7 @@
 import Foundation
 
 class AuthViewModel: ObservableObject {
-    private let apiService: APIService = .init()
+    private let apiService: APIService = .shared
     
     // Register/Login Properties
     @Published var name: String = ""
@@ -22,6 +22,7 @@ class AuthViewModel: ObservableObject {
     // Authentication State
     @Published var isAuthenticated: Bool = false
     
+    // Current User
     @Published var currentUser: User? = nil
     
     // Fetch Token from Keychain
@@ -75,7 +76,7 @@ class AuthViewModel: ObservableObject {
     }
     
     // Logout user
-    func logout() {
+    private func logout() {
         apiService.deleteAccessToken()
         APIService.accessToken = nil
         currentUser = nil
@@ -88,11 +89,10 @@ class AuthViewModel: ObservableObject {
         do {
             let response = try await apiService.fetchMe()
             print(response)
-            await MainActor.run {
-                self.currentUser = response
-            }
+            self.currentUser = response
         }
         catch {
+            // logout if error occurs
             print(error)
             logout()
         }
