@@ -13,12 +13,13 @@ struct MoviesView: View {
     var body: some View {
         NavigationStack {
             List(moviesViewModel.movies) { movie in
-                MovieRow(movie: movie, isLiked: moviesViewModel.likedMovies.contains(movie.id))
+                MovieRow(movie: movie, isLiked: moviesViewModel.likedMovieIDs.contains(movie.id))
             }
             .navigationTitle("Movies")
             .listStyle(.inset)
             .task {
                 await moviesViewModel.fetchMovies()
+                await moviesViewModel.fetchLikedMovieIDs()
             }
         }
     }
