@@ -26,16 +26,16 @@ class AuthViewModel: ObservableObject {
     @Published var currentUser: User? = nil
     
     // Fetch Token from Keychain
-    init() {
+    public func fetchToken() {
         if let token = apiService.readAccessToken() {
             APIService.accessToken = token
             self.isAuthenticated = true
             print("Token: \(token)")
-            
-            Task {
-                await fetchMe()
-            }
         }
+    }
+    
+    init() {
+        fetchToken()
     }
     
     // Switch UI to Register View / Login View
@@ -52,6 +52,7 @@ class AuthViewModel: ObservableObject {
                 apiService.save(accessToken: response.token)
                 isAuthenticated = true
                 print(response)
+                resetFields()
             }
             catch {
                 print(error)
@@ -68,6 +69,7 @@ class AuthViewModel: ObservableObject {
                 apiService.save(accessToken: response.token)
                 isAuthenticated = true
                 print(response)
+                resetFields()
             }
             catch {
                 print(error)
@@ -76,25 +78,17 @@ class AuthViewModel: ObservableObject {
     }
     
     // Logout user
-    private func logout() {
+    public func logout() {
         apiService.deleteAccessToken()
         APIService.accessToken = nil
         currentUser = nil
         isAuthenticated = false
     }
     
-    // Fetch current user
-    @MainActor
-    public func fetchMe() async {
-        do {
-            let response = try await apiService.fetchMe()
-            print(response)
-            self.currentUser = response
-        }
-        catch {
-            // logout if error occurs
-            print(error)
-            logout()
-        }
+    private func resetFields() {
+        name = ""
+        surname = ""
+        email = ""
+        password = ""
     }
 }

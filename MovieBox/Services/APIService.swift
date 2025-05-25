@@ -98,10 +98,10 @@ struct APIService {
     }
     
     // Update User Profile: Update the current user's profile information
-    func updateUserProfile(name: String, surname: String, email: String, password: String) async throws -> User {
+    func updateUserProfile(name: String, surname: String, email: String, password: String) async throws -> UpdateUserProfileResponse {
         let body = UpdateUserRequestBody(name: name, surname: surname, email: email, password: password)
         
-        let response: User = try await send(path: "api/users/profile", method: "PUT", body: body)
+        let response: UpdateUserProfileResponse = try await send(path: "api/users/profile", method: "PUT", body: body)
         
         return response
     }
