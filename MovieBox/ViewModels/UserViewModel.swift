@@ -25,20 +25,12 @@ class UserViewModel: ObservableObject {
     // Fetch Current User Data
     @MainActor
     public func fetchMe() async {
-        do {
-            let user = try await apiService.fetchMe()
-            
+        if let user = try? await apiService.fetchMe() {
             self.currentUser = user
             
             self.name = user.name
             self.surname = user.surname
             self.email = user.email
-        }
-        catch let error as AppError {
-            toast = Toast(message: error.errorDescription ?? "An error occurred", type: .error)
-        }
-        catch {
-            toast = Toast(message: "Failed to fetch user", type: .error)
         }
     }
     
