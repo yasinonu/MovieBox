@@ -12,6 +12,7 @@ struct LoginView: View {
     
     var body: some View {
         VStack(spacing: 20) {
+            Spacer()
             Text("MovieBox'a hoşgeldin")
                 .font(.largeTitle)
                 .fontWeight(.bold)
@@ -30,7 +31,16 @@ struct LoginView: View {
                 SecureField("Parola", text: $authViewModel.password)
                     .textFieldStyle(.roundedBorder)
                     .textInputAutocapitalization(.never)
-                Button(action: authViewModel.isRegisterView ? authViewModel.registerUser : authViewModel.loginUser) {
+                Button(action: {
+                    Task {
+                        if authViewModel.isRegisterView {
+                            await authViewModel.registerUser()
+                        }
+                        else {
+                            await authViewModel.loginUser()
+                        }
+                    }
+                }) {
                     Text(authViewModel.isRegisterView ? "Kayıt Ol": "Giriş Yap")
                         .fontWeight(.semibold)
                         .frame(width: 80)
@@ -48,6 +58,7 @@ struct LoginView: View {
                         .fontWeight(.medium)
                 }
             }
+            Spacer()
         }
         .padding()
     }
