@@ -38,19 +38,23 @@ struct MovieRow: View {
                         .foregroundStyle(.yellow)
                     Text(movie.rating.formatted(.number.precision(.fractionLength(1))))
                     Spacer()
-                    Image(systemName: isLiked ? "heart.fill" : "heart")
-                        .foregroundStyle(isLiked ? .red : .primary)
-                        .animation(.easeInOut, value: isLiked)
-                        .onTapGesture {
-                            Task {
-                                if !isLiked {
-                                    await moviesViewModel.likeMovie(id: movie.id)
-                                }
-                                else {
+                    if isLiked {
+                        Image(systemName: "heart.fill")
+                            .foregroundStyle(.red)
+                            .onTapGesture {
+                                Task {
                                     await moviesViewModel.unlikeMovie(id: movie.id)
                                 }
                             }
-                        }
+                    }
+                    else {
+                        Image(systemName: "heart")
+                            .onTapGesture {
+                                Task {
+                                    await moviesViewModel.likeMovie(id: movie.id)
+                                }
+                            }
+                    }
                 }
             }
         }
