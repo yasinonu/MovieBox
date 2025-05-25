@@ -12,6 +12,7 @@ enum AppError: LocalizedError, Identifiable {
 
     case networkError
     case decodingError
+    case encodingError
     case unauthorized
     case custom(String)
 
@@ -21,6 +22,8 @@ enum AppError: LocalizedError, Identifiable {
             return "Network connection failed."
         case .decodingError:
             return "Failed to parse server response."
+        case .encodingError:
+            return "Failed to encode request data."
         case .unauthorized:
             return "Session expired. Please login again."
         case .custom(let message):
