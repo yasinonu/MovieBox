@@ -28,7 +28,7 @@ struct APIService {
     func registerUser(name: String, surname: String, email: String, password: String) async throws -> RegisterResponse {
         let body = RegisterRequestBody(name: name, surname: surname, email: email, password: password)
         
-        let response: RegisterResponse = try await sendPOSTRequest(path: "api/auth/register", body: body)
+        let response: RegisterResponse = try await send(path: "api/auth/register", method: "POST", body: body, token: false)
         
         return response
     }
@@ -38,7 +38,7 @@ struct APIService {
     func loginUser(email: String, password: String) async throws -> RegisterResponse {
         let body = LoginRequestBody(email: email, password: password)
         
-        let response: RegisterResponse = try await sendPOSTRequest(path: "api/auth/login", body: body)
+        let response: RegisterResponse = try await send(path: "api/auth/login", method: "POST", body: body, token: false)
         
         return response
     }
@@ -46,7 +46,7 @@ struct APIService {
     // Fetch Me : Retrieve the current user's information
     
     func fetchMe() async throws -> User {
-        let response: User = try await sendGETRequest(path: "api/auth/me", accessToken: Self.accessToken)
+        let response: User = try await send(path: "api/auth/me", body: nil as String?)
         
         return response
     }
@@ -55,28 +55,28 @@ struct APIService {
     
     // Get Movies : Retrieve a list of movies
     func fetchAllMovies() async throws -> [Movie] {
-        let response: [Movie] = try await sendGETRequest(path: "api/movies")
+        let response: [Movie] = try await send(path: "api/movies", body: nil as String?, token: false)
         
         return response
     }
     
     // Get Movie : Retrieve a specific movie by ID
     func fetchMovieBy(id: String) async throws -> Movie {
-        let response: Movie = try await sendGETRequest(path: "api/movies/\(id)")
+        let response: Movie = try await send(path: "api/movies/\(id)", body: nil as String?, token: false)
         
         return response
     }
     
     // Like Movie : Like a specific movie by ID
     func likeMovie(id: Int) async throws -> MovieLikeResponse {
-        let response: MovieLikeResponse = try await sendPOSTRequest(path: "api/movies/like/\(id)", body: nil as String?, accessToken: Self.accessToken)
+        let response: MovieLikeResponse = try await send(path: "api/movies/like/\(id)", method: "POST", body: nil as String?)
         
         return response
     }
     
     // Unlike Movie : Unlike a specific movie by ID
     func unlikeMovie(id: Int) async throws -> MovieLikeResponse {
-        let response: MovieLikeResponse = try await sendPOSTRequest(path: "api/movies/unlike/\(id)", body: nil as String?, accessToken: Self.accessToken)
+        let response: MovieLikeResponse = try await send(path: "api/movies/unlike/\(id)", method: "POST", body: nil as String?)
         
         return response
     }
@@ -85,19 +85,26 @@ struct APIService {
     
     // Get Liked Movies : Retrieve a list of movies liked by the current user
     func fetchLikedMovies() async throws -> [Movie] {
-        let response: [Movie] = try await sendGETRequest(path: "/api/users/liked-movies", accessToken: Self.accessToken)
+        let response: [Movie] = try await send(path: "api/movies/liked-movies", body: nil as String?)
         
         return response
     }
     
     // Get Liked Movie IDs : Retrieve a list of movies liked by the current user
     func fetchLikedMovieIDs() async throws -> [Movie.ID] {
-        let response: [Movie.ID] = try await sendGETRequest(path: "/api/users/liked-movie-ids", accessToken: Self.accessToken)
+        let response: [Movie.ID] = try await send(path: "api/movies/liked-movie-ids", body: nil as String?)
         
         return response
     }
+    
+    // Update User Profile: Update the current user's profile information
+    func updateUserProfile(name: String, surname: String, email: String, password: String) async throws -> User {
+        let body = UpdateUserRequestBody(name: name, surname: surname, email: email, password: password)
         
-
+        let response: User = try await send(path: "api/users/profile", method: "PUT", body: body)
+        
+        return response
+    }
 
     
     // MARK: - Helpers
@@ -117,35 +124,21 @@ struct APIService {
         keychainHelper.delete(service: service, account: account)
     }
     
-    private func sendGETRequest<Response: Decodable>(path: String, accessToken: String? = nil) async throws -> Response {
-        let url = baseURL.appendingPathComponent(path)
-        
-        let request = URLRequest(url: url)
-        
-        return try await send(request: request, accessToken: accessToken)
-    }
-    
-    private func sendPOSTRequest<Response: Decodable, RequestBody: Encodable>(path: String, body: RequestBody? = nil, accessToken: String? = nil) async throws -> Response {
+    // Send Request : Send a request to the server
+    private func send<Response: Decodable, RequestBody: Encodable>(path: String, method: String = "GET", body: RequestBody? = nil, token: Bool = true) async throws -> Response {
         let url = baseURL.appendingPathComponent(path)
         
         var request = URLRequest(url: url)
         
-        request.httpMethod = "POST"
+        request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        if token, let accessToken = Self.accessToken {
+            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        }
         
         if let body {
             request.httpBody = try JSONEncoder().encode(body)
-        }
-        
-        return try await send(request: request, accessToken: accessToken)
-    }
-    
-    // Send Request : Send a request to the server
-    private func send<Response: Decodable>(request: URLRequest, accessToken: String? = nil) async throws -> Response {
-        var request = request
-        
-        if let accessToken {
-            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         }
         
         let (data, response) = try await URLSession.shared.data(for: request)
