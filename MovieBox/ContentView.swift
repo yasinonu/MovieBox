@@ -15,36 +15,41 @@ struct ContentView: View {
     @StateObject var userViewModel = UserViewModel()
     
     var body: some View {
-        if authViewModel.isAuthenticated {
-            TabView {
-                Tab {
-                    MoviesView()
-                } label: {
-                    Label("All Movies", systemImage: "film")
+        Group {
+            if authViewModel.isAuthenticated {
+                TabView {
+                    Tab {
+                        MoviesView()
+                    } label: {
+                        Label("All Movies", systemImage: "film")
+                    }
+                    Tab {
+                        LikedMoviesView()
+                    } label: {
+                        Label("Liked Movies", systemImage: "heart")
+                    }
+                    Tab {
+                        ProfileView()
+                    } label: {
+                        Label("Profile", systemImage: "person")
+                    }
                 }
-                Tab {
-                    LikedMoviesView()
-                } label: {
-                    Label("Liked Movies", systemImage: "heart")
-                }
-                Tab {
-                    ProfileView()
-                } label: {
-                    Label("Profile", systemImage: "person")
-                }
-            }
-            .environmentObject(movieViewModel)
-            .environmentObject(userViewModel)
-            .environmentObject(authViewModel)
-            .task {
-                authViewModel.fetchToken()
-                await userViewModel.fetchMe()
-            }
-        }
-        else {
-            LoginView()
+                .environmentObject(movieViewModel)
+                .environmentObject(userViewModel)
                 .environmentObject(authViewModel)
+                .task {
+                    authViewModel.fetchToken()
+                    await userViewModel.fetchMe()
+                }
+            }
+            else {
+                LoginView()
+                    .environmentObject(authViewModel)
+            }
         }
+        .toast($movieViewModel.toast)
+        .toast($userViewModel.toast)
+        .toast($authViewModel.toast)
     }
 }
 
