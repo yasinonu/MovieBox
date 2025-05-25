@@ -43,7 +43,7 @@ struct MovieRow: View {
                                     await moviesViewModel.likeMovie(id: movie.id)
                                 }
                                 else {
-                                    // await moviesViewModel.unlikeMovie(id: movie.id)
+                                    await moviesViewModel.unlikeMovie(id: movie.id)
                                 }
                             }
                         }
